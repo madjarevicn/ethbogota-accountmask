@@ -1,0 +1,29 @@
+{
+  "version": "1.2.0",
+  "description": "An example Snap for the 5-minute snap tutorial.",
+  "proposedName": "Gas Fee Snap Tutorial",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Montoya/gas-fee-snap.git"
+  },
+  "source": {
+    "shasum": "d+dS8HBndJ009wpT2CTg6HqUIhgqUkD14320ePwSBfs=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "iconPath": "images/gas.svg",
+        "packageName": "snap",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "snap_confirm": {},
+    "snap_notify": {},
+    "snap_manageState": {},
+    "endowment:network-access": {},
+    "endowment:long-running": {},
+    "endowment:transaction-insight": {}
+  },
+  "manifestVersion": "0.1"
+}
