@@ -121,7 +121,10 @@ export const Home = () => {
   // TODO: Change this value to get connected wallet
   const from = '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B';
 
+  const [fetchingWalletTransactions, setFetchingWalletTransactions] =
+    useState(false);
   const [walletTransactions, setWalletTransactions] = useState([]);
+
   const [storageField, setStorageField] = useState('');
   const [storageValue, setStorageValue] = useState('');
   const [txLabel, setTxLabel] = useState('');
@@ -265,10 +268,12 @@ export const Home = () => {
   };
 
   const fetchWalletTransactions = async () => {
+    setFetchingWalletTransactions(true);
     const response = await getTxList(from);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     setWalletTransactions(response ?? []);
+    setFetchingWalletTransactions(false);
   };
 
   useEffect(() => {
@@ -563,7 +568,11 @@ export const Home = () => {
           >
             Export to CSV
           </CSVLink>
-          <StorageButton title="Fetch Data" onClick={fetchWalletTransactions} />
+          <StorageButton
+            title={fetchingWalletTransactions ? 'Fetching...' : 'Fetch Data'}
+            disabled={fetchingWalletTransactions}
+            onClick={fetchWalletTransactions}
+          />
         </div>
         <BasicTable rows={walletTransactions ?? []} />
       </div>
