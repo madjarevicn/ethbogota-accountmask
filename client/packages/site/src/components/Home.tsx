@@ -595,7 +595,7 @@ export const Home = () => {
             //   { label: 'Note', key: 'note' },
             //   { label: 'Tx Hash', key: 'tx_hash' },
             // ]}
-            headers={['Created At', 'From', 'To', 'Note', 'Tx Hash']}
+            headers={['Tx Created At', 'From', 'To', 'Tx Note', 'Tx Hash']}
             data={walletTransactions.map((values: Record<string, any>) => {
               return [
                 values.created_at,
