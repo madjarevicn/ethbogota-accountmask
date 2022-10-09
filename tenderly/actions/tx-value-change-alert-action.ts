@@ -12,7 +12,7 @@ const Api = axios.create({
 
 // @ts-ignore
 const sendTxPayload = async (payload: Record<string, any>) => {
-  const { data } = await Api.post(`/transactions`, payload);
+  const { data } = await Api.post(`/alerts`, payload);
 
   if (!data) {
     throw new Error('No data from response');
@@ -24,9 +24,13 @@ const sendTxPayload = async (payload: Record<string, any>) => {
 export const actionFn: ActionFn = async (context: Context, event: Event) => {
   const alertEvent = event as AlertEvent;
   console.log(alertEvent);
-  // console.log('Sending request...');
-  // await sendTxPayload(alertEvent);
-  // console.log('Done');
+  console.log('Sending request...');
+  await sendTxPayload({
+    alert_type: 'Tx Value',
+    wallet: alertEvent.from,
+    payload: alertEvent,
+  });
+  console.log('Done');
 };
 
 module.exports = { actionFn };
