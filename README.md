@@ -7,8 +7,8 @@ Repository for EthBogota hackathon submission.
 Extending Metamask capabilities by allowing users to add description notes (comments) to the transactions they make through MM, alongside options for CSV export, as well as a Watchlist feature. :)
 
 ![](https://storage.googleapis.com/ethglobal-api-production/projects%2Fa51c3%2Fimages%2Fphoto_2022-10-09_08-15-38.jpg)
-![](https://storage.googleapis.com/ethglobal-api-production/projects%2Fa51c3%2Fimages%2Fphoto_2022-10-09_08-14-26.jpg)
 ![](https://storage.googleapis.com/ethglobal-api-production/projects%2Fa51c3%2Fimages%2Fphoto_2022-10-09_08-17-06.jpg)
+![](https://storage.googleapis.com/ethglobal-api-production/projects%2Fa51c3%2Fimages%2Farch.jpg)
 
 ## Project Description
 
