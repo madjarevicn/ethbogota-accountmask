@@ -1,0 +1,12 @@
+account_id: ""
+actions:
+  dzimiks-tenderly/alerting:
+    runtime: v1
+    sources: actions
+    specs:
+      successful-tx-alert-action:
+        description: Triggers alert whenever a successful transaction is created for the given wallet address.
+        function: successful-tx-alert-action:actionFn
+        trigger:
+          type: alert
+project_slug: ""

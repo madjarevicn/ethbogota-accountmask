@@ -18,7 +18,7 @@ Besides that, we have built watchlist feature, in order to get notifications whe
 
 ## How it's Made
 
-The project consist of 3 parts: React client, Laravel (PHP) backend and Tenderly Alerting using Web3 Actions under the hood.
+The project consist of 3 parts: React client, Laravel (PHP) backend and Tenderly Alerting using [Web3 Actions](https://docs.tenderly.co/web3-actions/intro-to-web3-actions) under the hood.
 
 The users will have 3 options to do:
 
