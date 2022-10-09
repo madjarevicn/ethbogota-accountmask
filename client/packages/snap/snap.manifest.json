@@ -1,10 +1,10 @@
 {
   "version": "1.2.0",
   "description": "An example Snap for the 5-minute snap tutorial.",
-  "proposedName": "Gas Fee Snap Tutorial",
+  "proposedName": "AccountMask",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Montoya/gas-fee-snap.git"
+    "url": "https://github.com/madjarevicn/ethbogota-accountmask.git"
   },
   "source": {
     "shasum": "jTtCsYsbFm74wo2Iq/mNFUv3+C9wsGO0ETqy1eujBqo=",

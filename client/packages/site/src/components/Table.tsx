@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
 
 // wallet: "0xe264e5ccac1453b29f4f3be71c8cd6bef67f2d1b",
 // note: "tx note test",
@@ -38,6 +39,7 @@ function BasicTable({ rows }: any) {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell sx={{ 'font-size': 16 }}>Created At</TableCell>
             <TableCell sx={{ 'font-size': 16 }}>Network</TableCell>
             <TableCell sx={{ 'font-size': 16 }}>Note</TableCell>
             <TableCell sx={{ 'font-size': 16 }}>Tx Hash</TableCell>
@@ -52,8 +54,9 @@ function BasicTable({ rows }: any) {
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row" sx={{ 'font-size': 16 }}>
-                {row.tx?.network}
+                {moment(row.created_at).format('LLL')}
               </TableCell>
+              <TableCell sx={{ 'font-size': 16 }}>{row.tx?.network}</TableCell>
               <TableCell sx={{ 'font-size': 16 }}>
                 {row.note ?? 'No note'}
               </TableCell>

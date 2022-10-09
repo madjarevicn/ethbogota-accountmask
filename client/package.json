@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "",
-  "homepage": "https://github.com/Montoya/gas-fee-snap-monorepo#readme",
+  "homepage": "https://github.com/madjarevicn/ethbogota-accountmask#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Montoya/gas-fee-snap.git"
+    "url": "git+https://github.com/madjarevicn/ethbogota-accountmask.git"
   },
   "license": "(MIT-0 OR Apache-2.0)",
   "author": "",

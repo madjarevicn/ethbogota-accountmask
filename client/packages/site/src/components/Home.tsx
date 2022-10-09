@@ -12,9 +12,9 @@ import {
   useStorage,
   isValidJSON,
   sendTransaction,
-  getAddressTxs,
   wait,
   shortenAddress,
+  // getAddressTxs,
   // getGas,
   // sendTx,
 } from '../utils';
@@ -23,8 +23,8 @@ import logo from '../assets/logo.png';
 import {
   ConnectButton,
   InstallFlaskButton,
-  NotificationButton,
   StorageButton,
+  // NotificationButton,
   // GetGasButton,
   // ReconnectButton,
 } from './Buttons';
@@ -137,6 +137,7 @@ export const Home = () => {
   const [toAddress, setToAddress] = useState(
     '0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69',
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [storageResponse, setStorageResponse] = useState('');
   const [state, dispatch] = useContext(MetaMaskContext);
 
@@ -186,18 +187,18 @@ export const Home = () => {
   //   }
   // };
 
-  const handleAddressTxsClick = async () => {
-    try {
-      // await getGas();
-      await getAddressTxs({
-        address: from,
-        // address: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC',
-      });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
+  // const handleAddressTxsClick = async () => {
+  //   try {
+  //     // await getGas();
+  //     await getAddressTxs({
+  //       address: from,
+  //       // address: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC',
+  //     });
+  //   } catch (e) {
+  //     console.error(e);
+  //     dispatch({ type: MetamaskActions.SetError, payload: e });
+  //   }
+  // };
 
   const handleSendNotification = async (message = 'message') => {
     try {
@@ -258,13 +259,13 @@ export const Home = () => {
       // TODO: Update storage by uuid with tx hash
       await handleUseStorage('updateStorage', {
         ...currentStorageValues,
-        notifications: {
-          ...currentStorageValues.notifications,
-          [id]: {
-            hash: txHash,
-            message: notificationMessage,
-          },
-        },
+        // notifications: {
+        //   ...currentStorageValues.notifications,
+        //   [id]: {
+        //     hash: txHash,
+        //     message: notificationMessage,
+        //   },
+        // },
         [id]: {
           ...currentStorageValues[id],
           hash: txHash,
@@ -294,6 +295,7 @@ export const Home = () => {
     setFetchingWalletTransactions(false);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteWalletTransactions = async () => {
     await deleteTxList(from);
     await fetchWalletTransactions();
@@ -394,48 +396,48 @@ export const Home = () => {
         {/*    !shouldDisplayReconnectButton(state.installedSnap)*/}
         {/*  }*/}
         {/* />*/}
+        {/* <Card*/}
+        {/*  content={{*/}
+        {/*    title: 'Show Txs for Address',*/}
+        {/*    description:*/}
+        {/*      'Fetches tx list for given address from Etherscan API.',*/}
+        {/*    button: (*/}
+        {/*      <StorageButton*/}
+        {/*        onClick={handleAddressTxsClick}*/}
+        {/*        disabled={!state.installedSnap}*/}
+        {/*        title="Show Txs"*/}
+        {/*      />*/}
+        {/*    ),*/}
+        {/*  }}*/}
+        {/*  disabled={!state.installedSnap}*/}
+        {/*  fullWidth={*/}
+        {/*    state.isFlask &&*/}
+        {/*    Boolean(state.installedSnap) &&*/}
+        {/*    !shouldDisplayReconnectButton(state.installedSnap)*/}
+        {/*  }*/}
+        {/* />*/}
+        {/* <Card*/}
+        {/*  content={{*/}
+        {/*    title: 'Send Notification',*/}
+        {/*    description: 'Notification testing...',*/}
+        {/*    button: (*/}
+        {/*      <NotificationButton*/}
+        {/*        onClick={() => handleSendNotification('message 123')}*/}
+        {/*        disabled={!state.installedSnap}*/}
+        {/*      />*/}
+        {/*    ),*/}
+        {/*  }}*/}
+        {/*  disabled={!state.installedSnap}*/}
+        {/*  fullWidth={*/}
+        {/*    state.isFlask &&*/}
+        {/*    Boolean(state.installedSnap) &&*/}
+        {/*    !shouldDisplayReconnectButton(state.installedSnap)*/}
+        {/*  }*/}
+        {/* />*/}
         <Card
           content={{
-            title: 'Show Txs for Address',
-            description:
-              'Fetches tx list for given address from Etherscan API.',
-            button: (
-              <StorageButton
-                onClick={handleAddressTxsClick}
-                disabled={!state.installedSnap}
-                title="Show Txs"
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Send Notification',
-            description: 'Notification testing...',
-            button: (
-              <NotificationButton
-                onClick={() => handleSendNotification('message 123')}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Manipulate Storage',
-            description: 'Storage usage...',
+            title: 'MetaMask Storage',
+            description: 'Play around with MetaMask storage.',
             button: (
               <div
                 style={{
@@ -500,7 +502,7 @@ export const Home = () => {
         <Card
           content={{
             title: 'Send Tx',
-            description: 'Tx testing...',
+            description: 'Send tx and get notified.',
             button: (
               <div
                 style={{
@@ -509,10 +511,10 @@ export const Home = () => {
                   gap: 12,
                 }}
               >
-                <div>
-                  <p>ljanemi: 0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC</p>
-                  <p>mikica: 0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7</p>
-                </div>
+                {/* <div>*/}
+                {/*  <p>ljanemi: 0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC</p>*/}
+                {/*  <p>mikica: 0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7</p>*/}
+                {/* </div>*/}
                 <TextField
                   id="tx-field"
                   label="Address"
@@ -576,16 +578,14 @@ export const Home = () => {
             //   { label: 'Note', key: 'note' },
             //   { label: 'Tx Hash', key: 'tx_hash' },
             // ]}
-            headers={['From', 'To', 'Note', 'Tx Hash']}
-            data={Object.keys(storageResponse ?? {}).map((key: string) => {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              const values = storageResponse[key];
+            headers={['Created At', 'From', 'To', 'Note', 'Tx Hash']}
+            data={walletTransactions.map((values: Record<string, any>) => {
               return [
-                values.params.from,
-                values.params.to,
+                values.created_at,
+                values.tx.from,
+                values.tx.to,
+                values.tx.hash,
                 values.note,
-                values.hash,
               ];
               // return [
               //   {
@@ -604,24 +604,24 @@ export const Home = () => {
             disabled={fetchingWalletTransactions}
             onClick={fetchWalletTransactions}
           />
-          <StorageButton
-            title="Delete Txs"
-            onClick={deleteWalletTransactions}
-            disabled
-          />
+          {/* <StorageButton*/}
+          {/*  title="Delete Txs"*/}
+          {/*  onClick={deleteWalletTransactions}*/}
+          {/*  disabled*/}
+          {/* />*/}
         </div>
         <BasicTable rows={walletTransactions ?? []} />
-        <div>
-          <h2>Links</h2>
-          <p>
-            Etherscan Account 1:
-            https://goerli.etherscan.io/address/0xe264e5ccac1453b29f4f3be71c8cd6bef67f2d1b
-          </p>
-          <p>
-            Etherscan Account 2:
-            https://goerli.etherscan.io/address/0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69
-          </p>
-        </div>
+        {/* <div>*/}
+        {/*  <h2>Links</h2>*/}
+        {/*  <p>*/}
+        {/*    Etherscan Account 1:*/}
+        {/*    https://goerli.etherscan.io/address/0xe264e5ccac1453b29f4f3be71c8cd6bef67f2d1b*/}
+        {/*  </p>*/}
+        {/*  <p>*/}
+        {/*    Etherscan Account 2:*/}
+        {/*    https://goerli.etherscan.io/address/0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69*/}
+        {/*  </p>*/}
+        {/* </div>*/}
       </div>
     </Container>
   );

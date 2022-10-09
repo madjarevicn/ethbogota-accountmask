@@ -7,7 +7,7 @@ import { Footer, Header, Home } from './components';
 import { MetaMaskProvider } from './hooks';
 
 import { light, dark, GlobalStyle } from './config/theme';
-import { setLocalStorage, getThemePreference } from './utils';
+import { setLocalStorage } from './utils';
 
 // eslint-disable-next-line import/no-unassigned-import
 import './styles/styles.css';
@@ -26,7 +26,8 @@ const Wrapper = styled.div`
 // });
 
 function App() {
-  const [darkTheme, setDarkTheme] = useState(getThemePreference());
+  // const [darkTheme, setDarkTheme] = useState(getThemePreference());
+  const [darkTheme, setDarkTheme] = useState(false);
 
   const toggleTheme = () => {
     setLocalStorage('theme', darkTheme ? 'light' : 'dark');
