@@ -117,8 +117,15 @@ export const Home = () => {
   const [storageField, setStorageField] = useState('');
   const [storageValue, setStorageValue] = useState('');
   const [txLabel, setTxLabel] = useState('');
+  const [toAddress, setToAddress] = useState(
+    '0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7',
+  );
   const [storageResponse, setStorageResponse] = useState('');
   const [state, dispatch] = useContext(MetaMaskContext);
+
+  const handleToAddressChange = (textEvent: ChangeEvent<HTMLInputElement>) => {
+    setToAddress(textEvent.target.value);
+  };
 
   const handleStorageChange = (textEvent: ChangeEvent<HTMLInputElement>) => {
     setStorageValue(textEvent.target.value);
@@ -185,10 +192,10 @@ export const Home = () => {
     options?: Record<string, any>,
   ) => {
     try {
-      const storageResp: any = await useStorage(method, options ?? {});
-      setStorageResponse(JSON.stringify(storageResp, null, 2));
-      console.log({ storageResp });
-      return storageResp ?? {};
+      const storageData: any = await useStorage(method, options ?? {});
+      setStorageResponse(JSON.stringify(storageData, null, 2));
+      console.log({ storageData });
+      return storageData ?? {};
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -205,9 +212,7 @@ export const Home = () => {
           // nonce: '0x00', // ignored by MetaMask
           // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
           // gas: '0x2710', // customizable by user during MetaMask confirmation.
-          // TODO: ljanemi
-          // to: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC', // Required except during contract publications.
-          to: '0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7', // Required except during contract publications.
+          to: toAddress, // Required except during contract publications.
           from: '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B', // must match user's active address.
           value: '0x8AC7230489E80', // Only required to send ether to the recipient from the initiating external account.
           // data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
@@ -244,12 +249,14 @@ export const Home = () => {
       <Subtitle>
         Export your labeled tx data to CSV and get notifications.
       </Subtitle>
-      <CardContainer>
+      <div>
         {state.error && (
           <ErrorMessage>
             <b>An error happened:</b> {state.error.message}
           </ErrorMessage>
         )}
+      </div>
+      <CardContainer>
         {!state.isFlask && (
           <Card
             content={{
@@ -362,8 +369,18 @@ export const Home = () => {
                   gap: 12,
                 }}
               >
+                <div>
+                  <p>ljanemi: 0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC</p>
+                  <p>mikica: 0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7</p>
+                </div>
                 <TextField
                   id="tx-field"
+                  label="Address"
+                  value={toAddress}
+                  onChange={handleToAddressChange}
+                />
+                <TextField
+                  id="tx-note"
                   label="Tx Note"
                   multiline
                   maxRows={4}
@@ -372,7 +389,7 @@ export const Home = () => {
                 />
                 <StorageButton
                   onClick={handleSendTx}
-                  disabled={!state.installedSnap}
+                  disabled={!state.installedSnap || !txLabel || !toAddress}
                   title="Send TX"
                 />
               </div>
