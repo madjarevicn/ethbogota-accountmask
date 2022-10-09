@@ -226,10 +226,6 @@ export const Home = () => {
     return {};
   };
 
-  const handleSetTxNote = async () => {
-    await updateTxPayload(from, transactionHash, txLabel);
-  };
-
   const handleSendTx = async (params: Record<string, any> = {}) => {
     try {
       const id: string = uuidv4();
@@ -293,6 +289,11 @@ export const Home = () => {
     // @ts-ignore
     setWalletTransactions(response ?? []);
     setFetchingWalletTransactions(false);
+  };
+
+  const handleSetTxNote = async () => {
+    await updateTxPayload(from, transactionHash, txLabel);
+    await fetchWalletTransactions();
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -462,33 +463,41 @@ export const Home = () => {
                   value={storageValue}
                   onChange={handleStorageChange}
                 />
-                <StorageButton
-                  onClick={async () => {
-                    const currentStorageValues: Record<string, any> =
-                      await handleUseStorage('getStorage');
-                    console.log({ currentStorageValues });
-                    return handleUseStorage('updateStorage', {
-                      ...currentStorageValues,
-                      [storageField]: isValidJSON(storageValue)
-                        ? JSON.parse(storageValue)
-                        : storageValue,
-                    });
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
                   }}
-                  disabled={
-                    !state.installedSnap || !storageValue || !storageField
-                  }
-                  title="Update Storage"
-                />
-                <StorageButton
-                  onClick={() => handleUseStorage('getStorage')}
-                  disabled={!state.installedSnap}
-                  title="Get Storage"
-                />
-                <StorageButton
-                  onClick={() => handleUseStorage('clearStorage')}
-                  disabled={!state.installedSnap}
-                  title="Clear Storage"
-                />
+                >
+                  <StorageButton
+                    onClick={async () => {
+                      const currentStorageValues: Record<string, any> =
+                        await handleUseStorage('getStorage');
+                      console.log({ currentStorageValues });
+                      return handleUseStorage('updateStorage', {
+                        ...currentStorageValues,
+                        [storageField]: isValidJSON(storageValue)
+                          ? JSON.parse(storageValue)
+                          : storageValue,
+                      });
+                    }}
+                    disabled={
+                      !state.installedSnap || !storageValue || !storageField
+                    }
+                    title="Update Storage"
+                  />
+                  <StorageButton
+                    onClick={() => handleUseStorage('getStorage')}
+                    disabled={!state.installedSnap}
+                    title="Get Storage"
+                  />
+                  <StorageButton
+                    onClick={() => handleUseStorage('clearStorage')}
+                    disabled={!state.installedSnap}
+                    title="Clear Storage"
+                  />
+                </div>
               </div>
             ),
           }}
@@ -535,18 +544,26 @@ export const Home = () => {
                   value={transactionHash}
                   onChange={handleTxHashChange}
                 />
-                <StorageButton
-                  onClick={handleSendTx}
-                  disabled={!state.installedSnap || !txLabel || !toAddress}
-                  title="Send TX"
-                />
-                <StorageButton
-                  onClick={handleSetTxNote}
-                  disabled={
-                    !state.installedSnap || !txLabel || !transactionHash
-                  }
-                  title="Set TX Note"
-                />
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <StorageButton
+                    onClick={handleSendTx}
+                    disabled={!state.installedSnap || !txLabel || !toAddress}
+                    title="Send TX"
+                  />
+                  <StorageButton
+                    onClick={handleSetTxNote}
+                    disabled={
+                      !state.installedSnap || !txLabel || !transactionHash
+                    }
+                    title="Update TX Note"
+                  />
+                </div>
               </div>
             ),
           }}
