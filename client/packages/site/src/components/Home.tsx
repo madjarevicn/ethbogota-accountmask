@@ -601,8 +601,8 @@ export const Home = () => {
                 values.created_at,
                 values.tx.from,
                 values.tx.to,
-                values.tx.hash,
                 values.note,
+                values.tx.hash,
               ];
               // return [
               //   {
