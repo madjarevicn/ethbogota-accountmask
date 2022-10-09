@@ -86,10 +86,11 @@ export const getAddressTxs = async (params: Record<string, any> = {}) => {
 };
 
 export const sendTransaction = async (
+  id: string,
   txLabel: string,
   params: Record<string, any> = {},
 ) => {
-  await window.ethereum.request({
+  return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
@@ -97,6 +98,7 @@ export const sendTransaction = async (
         method: 'sendTransaction',
         note: txLabel,
         params,
+        id,
       },
     ],
   });

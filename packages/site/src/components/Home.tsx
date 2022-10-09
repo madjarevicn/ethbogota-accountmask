@@ -1,6 +1,7 @@
 import { ChangeEvent, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
+import { v4 as uuidv4 } from 'uuid';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
@@ -179,27 +180,6 @@ export const Home = () => {
     }
   };
 
-  const handleSendTx = async (params: Record<string, any> = {}) => {
-    try {
-      const txParams =
-        {
-          // nonce: '0x00', // ignored by MetaMask
-          // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
-          // gas: '0x2710', // customizable by user during MetaMask confirmation.
-          to: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC', // Required except during contract publications.
-          from: '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B', // must match user's active address.
-          value: '0x8AC7230489E80', // Only required to send ether to the recipient from the initiating external account.
-          // data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
-          // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
-        } || params;
-      await sendTransaction(txLabel, txParams);
-      // await sendTx(txParams);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
   const handleUseStorage = async (
     method: 'updateStorage' | 'getStorage' | 'clearStorage',
     options?: Record<string, any>,
@@ -215,6 +195,45 @@ export const Home = () => {
     }
 
     return {};
+  };
+
+  const handleSendTx = async (params: Record<string, any> = {}) => {
+    try {
+      const id: string = uuidv4();
+      const txParams =
+        {
+          // nonce: '0x00', // ignored by MetaMask
+          // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
+          // gas: '0x2710', // customizable by user during MetaMask confirmation.
+          // TODO: ljanemi
+          // to: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC', // Required except during contract publications.
+          to: '0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7', // Required except during contract publications.
+          from: '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B', // must match user's active address.
+          value: '0x8AC7230489E80', // Only required to send ether to the recipient from the initiating external account.
+          // data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
+          // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+        } || params;
+      const txResponse = await sendTransaction(id, txLabel, txParams);
+      // await sendTx(txParams);
+      console.log({ txResponse });
+
+      const currentStorageValues: Record<string, any> = await handleUseStorage(
+        'getStorage',
+      );
+      console.log({ currentStorageValues });
+
+      // TODO: Update storage by uuid with tx hash
+      await handleUseStorage('updateStorage', {
+        ...currentStorageValues,
+        [id]: {
+          ...currentStorageValues[id],
+          hash: txResponse,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
   };
 
   return (

@@ -15,6 +15,13 @@ export const getAccounts = async () => {
   });
 };
 
+export const ethSendTransaction = async (params: Record<string, any>) => {
+  return wallet.request({
+    method: 'eth_sendTransaction',
+    params: [params],
+  });
+};
+
 export const getStorage = async () => {
   return wallet.request({
     method: 'snap_manageState',
@@ -179,7 +186,7 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
                 ...data,
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                [`${request.params.from}:${request.params.to}`]: {
+                [request.id]: {
                   params: request.params,
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
@@ -190,12 +197,38 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
           });
         });
 
-        return wallet.request({
-          method: 'eth_sendTransaction',
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          params: [request.params],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return ethSendTransaction(request.params).then((data: any) => {
+          getStorage().then((storageData: any) => {
+            return wallet.request({
+              method: 'snap_manageState',
+              params: [
+                'update',
+                {
+                  ...storageData,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  txResponse: {
+                    params: request.params,
+                    data,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    note: request.note,
+                  },
+                },
+              ],
+            });
+          });
+
+          return data;
         });
+        // return wallet.request({
+        //   method: 'eth_sendTransaction',
+        //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //   // @ts-ignore
+        //   params: [request.params],
+        // });
         // .then((txValue) => {
         //   return wallet.request({
         //     method: 'snap_confirm',
