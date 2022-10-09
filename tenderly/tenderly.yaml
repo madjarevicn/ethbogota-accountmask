@@ -4,9 +4,14 @@ actions:
     runtime: v1
     sources: actions
     specs:
-      successful-tx-alert-action:
-        description: Triggers alert whenever a successful transaction is created for the given wallet address.
-        function: successful-tx-alert-action:actionFn
+#      successful-tx-alert-action:
+#        description: Triggers alert whenever a successful transaction is created for the given wallet address.
+#        function: successful-tx-alert-action:actionFn
+#        trigger:
+#          type: alert
+      balance-alert-action:
+        description: This alert type notifies you when the ETH balance of an address falls below a certain threshold.
+        function: balance-alert-action:actionFn
         trigger:
           type: alert
 project_slug: ""
