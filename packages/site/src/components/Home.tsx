@@ -19,7 +19,7 @@ import {
   GetGasButton,
   InstallFlaskButton,
   NotificationButton,
-  ReconnectButton,
+  // ReconnectButton,
   StorageButton,
 } from './Buttons';
 import { Card } from './Card';
@@ -64,7 +64,7 @@ const Subtitle = styled.p`
 
 const CardContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   max-width: 1280px;
   padding: 1rem;
@@ -192,7 +192,7 @@ export const Home = () => {
           // data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
           // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
         } || params;
-      await sendTransaction(txParams);
+      await sendTransaction(txLabel, txParams);
       // await sendTx(txParams);
     } catch (e) {
       console.error(e);
@@ -220,7 +220,7 @@ export const Home = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>TX Inspector</Span>
+        Welcome to <Span>AccountMask</Span>
       </Heading>
       <Subtitle>
         Export your labeled tx data to CSV and get notifications.
@@ -258,22 +258,22 @@ export const Home = () => {
             disabled={!state.isFlask}
           />
         )}
-        {shouldDisplayReconnectButton(state.installedSnap) && (
-          <Card
-            content={{
-              title: 'Reconnect',
-              description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
-              button: (
-                <ReconnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-          />
-        )}
+        {/* {shouldDisplayReconnectButton(state.installedSnap) && (*/}
+        {/*  <Card*/}
+        {/*    content={{*/}
+        {/*      title: 'Reconnect',*/}
+        {/*      description:*/}
+        {/*        'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',*/}
+        {/*      button: (*/}
+        {/*        <ReconnectButton*/}
+        {/*          onClick={handleConnectClick}*/}
+        {/*          disabled={!state.installedSnap}*/}
+        {/*        />*/}
+        {/*      ),*/}
+        {/*    }}*/}
+        {/*    disabled={!state.installedSnap}*/}
+        {/*  />*/}
+        {/* )}*/}
         <Card
           content={{
             title: 'Show Gas Fees',
@@ -345,7 +345,7 @@ export const Home = () => {
               >
                 <TextField
                   id="tx-field"
-                  label="Tx Label"
+                  label="Tx Note"
                   multiline
                   maxRows={4}
                   value={txLabel}

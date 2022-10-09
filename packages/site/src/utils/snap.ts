@@ -45,7 +45,6 @@ export const connectSnap = async (
 export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   try {
     const snaps = await getSnaps();
-    console.log({ snaps });
 
     return Object.values(snaps).find(
       (snap) =>
@@ -86,13 +85,17 @@ export const getAddressTxs = async (params: Record<string, any> = {}) => {
   });
 };
 
-export const sendTransaction = async (params: Record<string, any> = {}) => {
+export const sendTransaction = async (
+  txLabel: string,
+  params: Record<string, any> = {},
+) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
         method: 'sendTransaction',
+        note: txLabel,
         params,
       },
     ],

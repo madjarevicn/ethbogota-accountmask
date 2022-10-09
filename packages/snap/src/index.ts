@@ -170,6 +170,26 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
 
     case 'sendTransaction': {
       return getAccounts().then(() => {
+        getStorage().then((data: any) => {
+          return wallet.request({
+            method: 'snap_manageState',
+            params: [
+              'update',
+              {
+                ...data,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                [`${request.params.from}:${request.params.to}`]: {
+                  params: request.params,
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  note: request.note,
+                },
+              },
+            ],
+          });
+        });
+
         return wallet.request({
           method: 'eth_sendTransaction',
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
