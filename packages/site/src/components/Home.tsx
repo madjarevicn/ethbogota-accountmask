@@ -2,6 +2,7 @@ import { ChangeEvent, useContext, useState } from 'react';
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
+import { CSVLink } from 'react-csv';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
@@ -193,8 +194,24 @@ export const Home = () => {
   ) => {
     try {
       const storageData: any = await useStorage(method, options ?? {});
-      setStorageResponse(JSON.stringify(storageData, null, 2));
-      console.log({ storageData });
+      setStorageResponse(storageData);
+      console.log({
+        storageData,
+        mapped: Object.entries(storageData),
+        data: Object.keys(storageResponse).map((key: string) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const values = storageResponse[key];
+          return [
+            {
+              from: values.params.from,
+              to: values.params.to,
+              note: values.note,
+              tx_hash: values.hash,
+            },
+          ];
+        }),
+      });
       return storageData ?? {};
     } catch (e) {
       console.error(e);
@@ -460,7 +477,9 @@ export const Home = () => {
                   disabled={!state.installedSnap}
                   title="Clear Storage"
                 />
-                <pre>{storageResponse || 'No Value'}</pre>
+                <pre>
+                  {JSON.stringify(storageResponse, null, 2) || 'No Value'}
+                </pre>
               </div>
             ),
           }}
@@ -472,6 +491,37 @@ export const Home = () => {
           }
         />
       </CardContainer>
+      <CSVLink
+        separator=";"
+        // headers={[
+        //   { label: 'From', key: 'from' },
+        //   { label: 'To', key: 'to' },
+        //   { label: 'Note', key: 'note' },
+        //   { label: 'Tx Hash', key: 'tx_hash' },
+        // ]}
+        headers={['From', 'To', 'Note', 'Tx Hash']}
+        data={Object.keys(storageResponse).map((key: string) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const values = storageResponse[key];
+          return [
+            values.params.from,
+            values.params.to,
+            values.note,
+            values.hash,
+          ];
+          // return [
+          //   {
+          //     from: values.params.from,
+          //     to: values.params.to,
+          //     note: values.note,
+          //     tx_hash: values.hash,
+          //   },
+          // ];
+        })}
+      >
+        Export to CSV
+      </CSVLink>
     </Container>
   );
 };
