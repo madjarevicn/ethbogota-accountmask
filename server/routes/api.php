@@ -24,5 +24,10 @@ Route::group(['prefix' => 'v1'], function ($router) {
         Route::post('/', [\App\Http\Controllers\Api\v1\Transaction\TransactionController::class, 'create']);
     });
 
+    Route::group(['prefix' => 'alerts'], function ($router) {
+        Route::get('/{wallet}', [\App\Http\Controllers\Api\v1\Transaction\TransactionController::class, 'showAlert']);
+        Route::post('/', [\App\Http\Controllers\Api\v1\Transaction\TransactionController::class, 'createAlert']);
+    });
+
 
 });

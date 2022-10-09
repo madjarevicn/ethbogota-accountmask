@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1\Transaction;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\TransactionRequest;
+use App\Models\Alert;
 use App\Models\Transaction;
 use App\Repository\TransactionRepositoryInterface;
 use Illuminate\Http\Request;
@@ -23,6 +24,43 @@ class TransactionController extends Controller
     public function __construct(TransactionRepositoryInterface $transactionRepositoryInterface)
     {
         $this->transactionRepositoryInterface = $transactionRepositoryInterface;
+    }
+
+    public function showAlert(Request $request) {
+        $wallet = strtolower($request->route('wallet'));
+
+        $alerts = Alert::where('wallet', $wallet)->get();
+
+        $data = [];
+
+        foreach ($alerts as $alert) {
+            $data[] = array_merge([
+                'wallet' => $alert->wallet,
+                'alert_type' => $alert->alert_type,
+                'created_at' => $alert->created_at
+            ], json_decode($alert->data, true));
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'alerts' => $data
+        ]);
+    }
+
+    public function createAlert(Request $request) {
+
+        $wallet = strtolower(Arr::get($request->all(), 'wallet'));
+        $type = Arr::get($request->all(), 'alert_type');
+        $payload = Arr::get($request->all(), 'payload');
+
+
+        Alert::create([
+            'wallet' => $wallet,
+            'alert_type' => $type,
+            'data' => json_encode($payload)
+        ]);
+
+        return response()->json(['status' => 'ok']);
     }
 
     public function create(Request $request)
@@ -65,6 +103,7 @@ class TransactionController extends Controller
             $data[] = [
                 'wallet' => $transaction->wallet,
                 'note' => $transaction->note,
+                'created_at' => $transaction->created_at,
                 'tx' => json_decode($transaction->transaction, true)
             ];
         }
