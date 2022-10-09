@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TextField } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,24 +7,27 @@ import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
   getSnap,
-  getGas,
   shouldDisplayReconnectButton,
   sendNotification,
   useStorage,
   isValidJSON,
   sendTransaction,
   getAddressTxs,
+  wait,
+  // getGas,
   // sendTx,
 } from '../utils';
+import { getTxList, updateTxPayload } from '../services';
 import {
   ConnectButton,
-  GetGasButton,
   InstallFlaskButton,
   NotificationButton,
-  // ReconnectButton,
   StorageButton,
+  // GetGasButton,
+  // ReconnectButton,
 } from './Buttons';
 import { Card } from './Card';
+import { BasicTable } from './Table';
 
 const Container = styled.div`
   display: flex;
@@ -66,7 +69,7 @@ const Subtitle = styled.p`
 
 const CardContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   max-width: 1280px;
   padding: 1rem;
@@ -115,9 +118,14 @@ const ErrorMessage = styled.div`
 `;
 
 export const Home = () => {
+  // TODO: Change this value to get connected wallet
+  const from = '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B';
+
+  const [walletTransactions, setWalletTransactions] = useState([]);
   const [storageField, setStorageField] = useState('');
   const [storageValue, setStorageValue] = useState('');
   const [txLabel, setTxLabel] = useState('');
+  const [transactionHash, setTransactionHash] = useState('');
   const [toAddress, setToAddress] = useState(
     '0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7',
   );
@@ -134,6 +142,10 @@ export const Home = () => {
 
   const handleTxLabelChange = (textEvent: ChangeEvent<HTMLInputElement>) => {
     setTxLabel(textEvent.target.value);
+  };
+
+  const handleTxHashChange = (textEvent: ChangeEvent<HTMLInputElement>) => {
+    setTransactionHash(textEvent.target.value);
   };
 
   const handleStorageFieldChange = (
@@ -157,14 +169,14 @@ export const Home = () => {
     }
   };
 
-  const handleGetGasClick = async () => {
-    try {
-      await getGas();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
+  // const handleGetGasClick = async () => {
+  //   try {
+  //     await getGas();
+  //   } catch (e) {
+  //     console.error(e);
+  //     dispatch({ type: MetamaskActions.SetError, payload: e });
+  //   }
+  // };
 
   const handleAddressTxsClick = async () => {
     try {
@@ -194,24 +206,8 @@ export const Home = () => {
   ) => {
     try {
       const storageData: any = await useStorage(method, options ?? {});
-      setStorageResponse(storageData);
-      console.log({
-        storageData,
-        mapped: Object.entries(storageData),
-        data: Object.keys(storageResponse).map((key: string) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const values = storageResponse[key];
-          return [
-            {
-              from: values.params.from,
-              to: values.params.to,
-              note: values.note,
-              tx_hash: values.hash,
-            },
-          ];
-        }),
-      });
+      console.log({ handleUseStorage: storageData });
+      setStorageResponse(storageData ?? {});
       return storageData ?? {};
     } catch (e) {
       console.error(e);
@@ -219,6 +215,10 @@ export const Home = () => {
     }
 
     return {};
+  };
+
+  const handleSetTxNote = async () => {
+    await updateTxPayload(from, transactionHash, txLabel);
   };
 
   const handleSendTx = async (params: Record<string, any> = {}) => {
@@ -230,14 +230,14 @@ export const Home = () => {
           // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
           // gas: '0x2710', // customizable by user during MetaMask confirmation.
           to: toAddress, // Required except during contract publications.
-          from: '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B', // must match user's active address.
+          from, // must match user's active address.
           value: '0x8AC7230489E80', // Only required to send ether to the recipient from the initiating external account.
           // data: '0x7f7465737432000000000000000000000000000000000000000000000000000000600057', // Optional, but used for defining smart contract creation and interaction.
           // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
         } || params;
-      const txResponse = await sendTransaction(id, txLabel, txParams);
+      const txHash = await sendTransaction(id, txLabel, txParams);
       // await sendTx(txParams);
-      console.log({ txResponse });
+      console.log({ txHash });
 
       const currentStorageValues: Record<string, any> = await handleUseStorage(
         'getStorage',
@@ -249,14 +249,31 @@ export const Home = () => {
         ...currentStorageValues,
         [id]: {
           ...currentStorageValues[id],
-          hash: txResponse,
+          hash: txHash,
         },
       });
+
+      // Mock wait while W3A sends a notification to BE
+      await wait(30000);
+
+      // Update tx hash for given wallet address with the tx note
+      await updateTxPayload(from, txHash as string, txLabel);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
+
+  const fetchWalletTransactions = async () => {
+    const response = await getTxList(from);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    setWalletTransactions(response ?? []);
+  };
+
+  useEffect(() => {
+    fetchWalletTransactions();
+  }, []);
 
   return (
     <Container>
@@ -317,25 +334,25 @@ export const Home = () => {
         {/*    disabled={!state.installedSnap}*/}
         {/*  />*/}
         {/* )}*/}
-        <Card
-          content={{
-            title: 'Show Gas Fees',
-            description:
-              'Display a custom message with current gas fees in MetaMask.',
-            button: (
-              <GetGasButton
-                onClick={handleGetGasClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+        {/* <Card*/}
+        {/*  content={{*/}
+        {/*    title: 'Show Gas Fees',*/}
+        {/*    description:*/}
+        {/*      'Display a custom message with current gas fees in MetaMask.',*/}
+        {/*    button: (*/}
+        {/*      <GetGasButton*/}
+        {/*        onClick={handleGetGasClick}*/}
+        {/*        disabled={!state.installedSnap}*/}
+        {/*      />*/}
+        {/*    ),*/}
+        {/*  }}*/}
+        {/*  disabled={!state.installedSnap}*/}
+        {/*  fullWidth={*/}
+        {/*    state.isFlask &&*/}
+        {/*    Boolean(state.installedSnap) &&*/}
+        {/*    !shouldDisplayReconnectButton(state.installedSnap)*/}
+        {/*  }*/}
+        {/* />*/}
         <Card
           content={{
             title: 'Show Txs for Address',
@@ -376,6 +393,71 @@ export const Home = () => {
         />
         <Card
           content={{
+            title: 'Manipulate Storage',
+            description: 'Storage usage...',
+            button: (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                }}
+              >
+                <TextField
+                  id="outlined-multiline-field"
+                  label="Storage Field Name"
+                  multiline
+                  maxRows={4}
+                  value={storageField}
+                  onChange={handleStorageFieldChange}
+                />
+                <TextField
+                  id="outlined-multiline-flexible"
+                  label="Storage JSON Value"
+                  multiline
+                  maxRows={4}
+                  value={storageValue}
+                  onChange={handleStorageChange}
+                />
+                <StorageButton
+                  onClick={async () => {
+                    const currentStorageValues: Record<string, any> =
+                      await handleUseStorage('getStorage');
+                    console.log({ currentStorageValues });
+                    return handleUseStorage('updateStorage', {
+                      ...currentStorageValues,
+                      [storageField]: isValidJSON(storageValue)
+                        ? JSON.parse(storageValue)
+                        : storageValue,
+                    });
+                  }}
+                  disabled={
+                    !state.installedSnap || !storageValue || !storageField
+                  }
+                  title="Update Storage"
+                />
+                <StorageButton
+                  onClick={() => handleUseStorage('getStorage')}
+                  disabled={!state.installedSnap}
+                  title="Get Storage"
+                />
+                <StorageButton
+                  onClick={() => handleUseStorage('clearStorage')}
+                  disabled={!state.installedSnap}
+                  title="Clear Storage"
+                />
+              </div>
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
             title: 'Send Tx',
             description: 'Tx testing...',
             button: (
@@ -404,82 +486,24 @@ export const Home = () => {
                   value={txLabel}
                   onChange={handleTxLabelChange}
                 />
+                <TextField
+                  id="tx-hash"
+                  label="Tx Hash"
+                  value={transactionHash}
+                  onChange={handleTxHashChange}
+                />
                 <StorageButton
                   onClick={handleSendTx}
                   disabled={!state.installedSnap || !txLabel || !toAddress}
                   title="Send TX"
                 />
-              </div>
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Manipulate Storage',
-            description: 'Storage usage...',
-            button: (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 12,
-                }}
-              >
-                <TextField
-                  id="outlined-multiline-field"
-                  label="Storage Field Name"
-                  multiline
-                  maxRows={4}
-                  value={storageField}
-                  onChange={handleStorageFieldChange}
-                />
-                <TextField
-                  id="outlined-multiline-flexible"
-                  label="Storage JSON Value"
-                  multiline
-                  maxRows={4}
-                  value={storageValue}
-                  onChange={handleStorageChange}
-                />
-                {!isValidJSON(storageValue) && (
-                  <p className="DangerText">Not valid JSON</p>
-                )}
                 <StorageButton
-                  onClick={async () => {
-                    const currentStorageValues: Record<string, any> =
-                      await handleUseStorage('getStorage');
-                    console.log({ currentStorageValues });
-                    return handleUseStorage('updateStorage', {
-                      ...currentStorageValues,
-                      [storageField]: isValidJSON(storageValue)
-                        ? JSON.parse(storageValue)
-                        : storageValue,
-                    });
-                  }}
+                  onClick={handleSetTxNote}
                   disabled={
-                    !state.installedSnap || !storageValue || !storageField
+                    !state.installedSnap || !txLabel || !transactionHash
                   }
-                  title="Update Storage"
+                  title="Set TX Note"
                 />
-                <StorageButton
-                  onClick={() => handleUseStorage('getStorage')}
-                  disabled={!state.installedSnap}
-                  title="Get Storage"
-                />
-                <StorageButton
-                  onClick={() => handleUseStorage('clearStorage')}
-                  disabled={!state.installedSnap}
-                  title="Clear Storage"
-                />
-                <pre>
-                  {JSON.stringify(storageResponse, null, 2) || 'No Value'}
-                </pre>
               </div>
             ),
           }}
@@ -491,37 +515,58 @@ export const Home = () => {
           }
         />
       </CardContainer>
-      <CSVLink
-        separator=";"
-        // headers={[
-        //   { label: 'From', key: 'from' },
-        //   { label: 'To', key: 'to' },
-        //   { label: 'Note', key: 'note' },
-        //   { label: 'Tx Hash', key: 'tx_hash' },
-        // ]}
-        headers={['From', 'To', 'Note', 'Tx Hash']}
-        data={Object.keys(storageResponse).map((key: string) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const values = storageResponse[key];
-          return [
-            values.params.from,
-            values.params.to,
-            values.note,
-            values.hash,
-          ];
-          // return [
-          //   {
-          //     from: values.params.from,
-          //     to: values.params.to,
-          //     note: values.note,
-          //     tx_hash: values.hash,
-          //   },
-          // ];
-        })}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 12,
+          padding: '1rem',
+          width: '100%',
+          maxWidth: 1280,
+        }}
       >
-        Export to CSV
-      </CSVLink>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CSVLink
+            className="Button"
+            separator=";"
+            // headers={[
+            //   { label: 'From', key: 'from' },
+            //   { label: 'To', key: 'to' },
+            //   { label: 'Note', key: 'note' },
+            //   { label: 'Tx Hash', key: 'tx_hash' },
+            // ]}
+            headers={['From', 'To', 'Note', 'Tx Hash']}
+            data={Object.keys(storageResponse ?? {}).map((key: string) => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const values = storageResponse[key];
+              console.log({
+                storageResponse,
+                values,
+                key,
+              });
+              return [
+                values.params.from,
+                values.params.to,
+                values.note,
+                values.hash,
+              ];
+              // return [
+              //   {
+              //     from: values.params.from,
+              //     to: values.params.to,
+              //     note: values.note,
+              //     tx_hash: values.hash,
+              //   },
+              // ];
+            })}
+          >
+            Export to CSV
+          </CSVLink>
+          <StorageButton title="Fetch Data" onClick={fetchWalletTransactions} />
+        </div>
+        <BasicTable rows={walletTransactions ?? []} />
+      </div>
     </Container>
   );
 };

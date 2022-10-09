@@ -14,7 +14,8 @@ type CardProps = {
 const CardWrapper = styled.div<{ fullWidth?: boolean; disabled: boolean }>`
   display: flex;
   flex-direction: column;
-  width: ${({ fullWidth }) => (fullWidth ? '100%' : '350px')};
+  max-width: 100%;
+  // width: ${({ fullWidth }) => (fullWidth ? '100%' : '100%')};
   background-color: ${({ theme }) => theme.colors.card.default};
   //margin-top: 2.4rem;
   //margin-bottom: 2.4rem;

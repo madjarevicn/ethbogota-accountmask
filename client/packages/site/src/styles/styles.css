@@ -5,3 +5,22 @@
 .DangerText {
   color: #d32f2f;
 }
+
+.Button {
+  font-size: 1.4rem;
+  border-radius: 8px;
+  background-color: #141618;
+  color: #FFFFFF;
+  border: 1px solid #141618;
+  font-weight: bold;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+  text-decoration: none;
+}
+
+.Button:hover {
+  background-color: transparent;
+  border: 1px solid #141618;
+  color: #24272A;
+}

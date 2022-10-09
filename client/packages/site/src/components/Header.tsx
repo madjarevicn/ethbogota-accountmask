@@ -1,10 +1,9 @@
 import { useContext } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
-import { connectSnap, getThemePreference, getSnap } from '../utils';
+import { connectSnap, getSnap } from '../utils';
 import { HeaderButtons } from './Buttons';
 import { SnapLogo } from './SnapLogo';
-import { Toggle } from './Toggle';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -38,6 +37,7 @@ const RightContainer = styled.div`
 `;
 
 export const Header = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handleToggleClick,
 }: {
   handleToggleClick(): void;
@@ -66,10 +66,10 @@ export const Header = ({
         <Title>AccountMask</Title>
       </LogoWrapper>
       <RightContainer>
-        <Toggle
-          onToggle={handleToggleClick}
-          defaultChecked={getThemePreference()}
-        />
+        {/* <Toggle*/}
+        {/*  onToggle={handleToggleClick}*/}
+        {/*  defaultChecked={getThemePreference()}*/}
+        {/* />*/}
         <HeaderButtons state={state} onConnectClick={handleConnectClick} />
       </RightContainer>
     </HeaderWrapper>

@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export const Api = axios.create({
-  baseURL: 'https://localhost:8080',
+  baseURL: 'https://ethbogota-accountmask-backend.herokuapp.com/api/v1',
 });
