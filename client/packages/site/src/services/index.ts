@@ -21,9 +21,9 @@ export const updateTxPayload = async (
     wallet: address,
   });
 
-  if (!data) {
-    throw new Error('No data from response');
-  }
+  // if (!data) {
+  //   throw new Error('No data from response');
+  // }
 
   return data;
 };
@@ -36,4 +36,14 @@ export const getTxList = async (address: string) => {
   }
 
   return data.transactions;
+};
+
+export const deleteTxList = async (address: string) => {
+  const { data } = await Api.delete(`/transactions/${address}`);
+
+  // if (!data) {
+  //   throw new Error('No data from response');
+  // }
+
+  return data;
 };

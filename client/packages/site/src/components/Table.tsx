@@ -6,6 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { v4 as uuidv4 } from 'uuid';
 
 // wallet: "0xe264e5ccac1453b29f4f3be71c8cd6bef67f2d1b",
 // note: "tx note test",
@@ -47,7 +48,7 @@ function BasicTable({ rows }: any) {
         <TableBody>
           {rows.map((row: Record<string, any>) => (
             <TableRow
-              key={row.tx?.hash ?? 'key'}
+              key={uuidv4()}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row" sx={{ 'font-size': 16 }}>

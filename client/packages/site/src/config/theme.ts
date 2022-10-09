@@ -59,7 +59,7 @@ export const light: DefaultTheme = {
       default: '#BBC0C5',
     },
     primary: {
-      default: '#6F4CFF',
+      default: '#ff6f00',
       inverse: '#FFFFFF',
     },
     card: {

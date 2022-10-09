@@ -104,13 +104,17 @@ export const sendTransaction = async (
   });
 };
 
-export const sendNotification = async (method: 'inApp' | 'native') => {
+export const sendNotification = async (
+  method: 'inApp' | 'native',
+  message: string,
+) => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
         method,
+        message,
       },
     ],
   });

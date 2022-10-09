@@ -134,7 +134,9 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
         params: [
           {
             type: 'inApp',
-            message: `Hello, ${origin}! Desi Lane!`,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            message: request.message,
           },
         ],
       });

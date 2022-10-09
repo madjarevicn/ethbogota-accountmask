@@ -14,10 +14,12 @@ import {
   sendTransaction,
   getAddressTxs,
   wait,
+  shortenAddress,
   // getGas,
   // sendTx,
 } from '../utils';
-import { getTxList, updateTxPayload } from '../services';
+import { deleteTxList, getTxList, updateTxPayload } from '../services';
+import logo from '../assets/logo.png';
 import {
   ConnectButton,
   InstallFlaskButton,
@@ -34,8 +36,8 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   flex: 1;
-  margin-top: 7.6rem;
-  margin-bottom: 7.6rem;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
 
   ${({ theme }) => theme.mediaQueries.small} {
     padding-left: 2.4rem;
@@ -57,10 +59,11 @@ const Span = styled.span`
 `;
 
 const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.large};
+  font-size: ${({ theme }) => theme.fontSizes.text};
   font-weight: 500;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: 24px;
+  text-align: center;
 
   ${({ theme }) => theme.mediaQueries.small} {
     font-size: ${({ theme }) => theme.fontSizes.text};
@@ -119,6 +122,8 @@ const ErrorMessage = styled.div`
 
 export const Home = () => {
   // TODO: Change this value to get connected wallet
+  //  Account 1: 0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B
+  //  Account 2: 0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69
   const from = '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B';
 
   const [fetchingWalletTransactions, setFetchingWalletTransactions] =
@@ -130,7 +135,7 @@ export const Home = () => {
   const [txLabel, setTxLabel] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [toAddress, setToAddress] = useState(
-    '0x93FE1BFCF7AeB6d84bCB18BF23FE3f10A7d741F7',
+    '0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69',
   );
   const [storageResponse, setStorageResponse] = useState('');
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -185,7 +190,7 @@ export const Home = () => {
     try {
       // await getGas();
       await getAddressTxs({
-        address: '0xe264e5cCac1453b29f4f3Be71C8Cd6bEf67F2d1B',
+        address: from,
         // address: '0xFcE6f67c4fa7423791aC2782D29824A4CDDb1AaC',
       });
     } catch (e) {
@@ -194,9 +199,9 @@ export const Home = () => {
     }
   };
 
-  const handleSendNotification = async () => {
+  const handleSendNotification = async (message = 'message') => {
     try {
-      await sendNotification('inApp');
+      await sendNotification('inApp', message);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -239,22 +244,35 @@ export const Home = () => {
           // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
         } || params;
       const txHash = await sendTransaction(id, txLabel, txParams);
-      // await sendTx(txParams);
       console.log({ txHash });
 
       const currentStorageValues: Record<string, any> = await handleUseStorage(
         'getStorage',
       );
       console.log({ currentStorageValues });
+      const notificationMessage = `${shortenAddress(
+        from,
+        true,
+      )} sent a tx to ${shortenAddress(toAddress, true)}`;
 
       // TODO: Update storage by uuid with tx hash
       await handleUseStorage('updateStorage', {
         ...currentStorageValues,
+        notifications: {
+          ...currentStorageValues.notifications,
+          [id]: {
+            hash: txHash,
+            message: notificationMessage,
+          },
+        },
         [id]: {
           ...currentStorageValues[id],
           hash: txHash,
         },
       });
+
+      // Send notification to MetaMask
+      await handleSendNotification(notificationMessage);
 
       // Mock wait while W3A sends a notification to BE
       await wait(30000);
@@ -276,17 +294,35 @@ export const Home = () => {
     setFetchingWalletTransactions(false);
   };
 
+  const deleteWalletTransactions = async () => {
+    await deleteTxList(from);
+    await fetchWalletTransactions();
+  };
+
   useEffect(() => {
     fetchWalletTransactions();
   }, []);
 
   return (
     <Container>
-      <Heading>
-        Welcome to <Span>AccountMask</Span>
-      </Heading>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 12,
+        }}
+      >
+        <img src={logo} alt="AccountMask" width={150} />
+        <Heading>
+          Welcome to <Span>AccountMask</Span>
+        </Heading>
+      </div>
       <Subtitle>
-        Export your labeled tx data to CSV and get notifications.
+        Create a CSV file from your labeled tx data and receive alerts when a
+        successful transaction is made to your wallet address or when an
+        address's ETH balance drops below a predetermined level.
       </Subtitle>
       <div>
         {state.error && (
@@ -384,7 +420,7 @@ export const Home = () => {
             description: 'Notification testing...',
             button: (
               <NotificationButton
-                onClick={handleSendNotification}
+                onClick={() => handleSendNotification('message 123')}
                 disabled={!state.installedSnap}
               />
             ),
@@ -545,11 +581,6 @@ export const Home = () => {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               const values = storageResponse[key];
-              console.log({
-                storageResponse,
-                values,
-                key,
-              });
               return [
                 values.params.from,
                 values.params.to,
@@ -573,8 +604,24 @@ export const Home = () => {
             disabled={fetchingWalletTransactions}
             onClick={fetchWalletTransactions}
           />
+          <StorageButton
+            title="Delete Txs"
+            onClick={deleteWalletTransactions}
+            disabled
+          />
         </div>
         <BasicTable rows={walletTransactions ?? []} />
+        <div>
+          <h2>Links</h2>
+          <p>
+            Etherscan Account 1:
+            https://goerli.etherscan.io/address/0xe264e5ccac1453b29f4f3be71c8cd6bef67f2d1b
+          </p>
+          <p>
+            Etherscan Account 2:
+            https://goerli.etherscan.io/address/0x0F6A2d7b53E102683CFB4a9939c7Bf75e311bE69
+          </p>
+        </div>
       </div>
     </Container>
   );

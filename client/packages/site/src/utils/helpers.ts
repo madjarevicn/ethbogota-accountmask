@@ -1,4 +1,4 @@
-export const isValidJSON = (value: string) => {
+export const isValidJSON = (value: string): boolean => {
   try {
     JSON.parse(value);
   } catch (e) {
@@ -15,5 +15,21 @@ export const wait = (time = 500, val = true) =>
     }, time);
   });
 
-export const isArray = (array: any) =>
+export const isArray = (array: any): boolean =>
   Object.prototype.toString.call(array) === '[object Array]';
+
+export const shortenAddress = (
+  address: string,
+  expanded = false,
+  amount = 6,
+): string => {
+  if (!address) {
+    return '';
+  }
+
+  if (expanded) {
+    return `${address.slice(0, 5)}...${address.slice(-5)}`;
+  }
+
+  return `${address.slice(0, amount)}...`;
+};
